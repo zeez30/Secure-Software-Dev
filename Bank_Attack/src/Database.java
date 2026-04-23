@@ -23,9 +23,11 @@ public class Database {
      * Authenticate the user with username and password
      */
     public static boolean authenticateUser(String username, String password) {
-        String query = "SELECT * FROM LoginInformation WHERE username = '" + username + "' AND password = '" + password + "'";
+        String query = "SELECT * FROM LoginInformation WHERE username = ? AND password = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, username);
+                pstmt.setString(2, password);
              ResultSet rs = pstmt.executeQuery();
 
             return rs.next();
@@ -278,10 +280,11 @@ public class Database {
      * Add or update type information
      */
     public static boolean setUserType(String username, String type) {
-        String query = "UPDATE LoginInformation SET type = '" + type + "' WHERE username = '" + username + "'";
+        String query = "UPDATE LoginInformation SET type = ? WHERE username = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
-
+                pstmt.setString(1, type);
+                pstmt.setString(2, username);
             int rowsUpdated = pstmt.executeUpdate();
             return rowsUpdated > 0;
         } catch (SQLException e) {
