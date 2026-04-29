@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.ServletException;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * Java servlet for displaying the transfer page, get user input, and call doTransfer servlet.
@@ -42,6 +44,12 @@ public class TransferPageServlet extends HttpServlet {
 			String result = (String) session.getAttribute("result");
 			String username = (String) session.getAttribute("username");
 			Integer credits = (Integer) session.getAttribute("credit");
+
+                        String csrfToken = (String) session.getAttribute("csrfToken");
+                        if (csrfToken == null) {
+                                csrfToken = generateCRSFToken();
+                                session.setAttribute("csrfToken", csrfToken);
+                        }
 		
 			// Set up the response content	
 			PrintWriter content = res.getWriter();
@@ -94,6 +102,8 @@ public class TransferPageServlet extends HttpServlet {
 
                         // Begin the form
                         content.println("<form action=\"transfer\" method=\"POST\" accept-charset=\"utf-8\">");
+                        content.println("<input type=\"hidden\" name=\"csrfToken\" value=\"" + csrfToken + "\">");
+
 
                         // Display response message if available
                         if (result != null && !result.isEmpty()) {
@@ -149,6 +159,12 @@ public class TransferPageServlet extends HttpServlet {
                 res.setStatus(HttpServletResponse.SC_OK);
 
                 // Get two parameters: the user to whom credits are trasferred and the number of credits to transfer
+                String csrftToken = (String) session.getAttribute("csrfToken");
+                String submittedToken = red.getParameter("csrfToken");
+                if (csrf == null || !csrfToken.Equals(submittedToken)) {
+                        res.sendRedirect("/transfer");
+                        return;
+                }
                 String to = req.getParameter("to");
                 String transferAmount = req.getParameter("transferAmount");
                 int addBalance = 0;
@@ -186,4 +202,10 @@ public class TransferPageServlet extends HttpServlet {
                 }
 
 	}
+        private String generateCRSFToken(){
+                SecureRandom random = new SecureRandom();
+                byte[] byte = new byte[32];
+                random.nextBytes(bytes);
+                return Base64.getUrlEncoder().encodeToString(bytes);
+        }
 }
