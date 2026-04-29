@@ -140,9 +140,9 @@ public class AccountPageServlet extends HttpServlet {
 			if(profile == null){
 				profile = "";
 			}
-        	content.println("<div class=\"sevralLine\" id=\"profile\" >" + profile + "</div>");
+        	content.println("<div class=\"sevralLine\" id=\"profile\" >" + encodeHTML(profile) + "</div>");
 			if(thisUsername == null || thisUsername.equals(username)){
-        		content.println("<textarea placeholder=\"Change Your Profile\" class=\"inputField\">" + profile  + "</textarea>");
+        		content.println("<textarea placeholder=\"Change Your Profile\" class=\"inputField\">" + encodeHTML(profile) + "</textarea>");
 				content.println("<button id=\"submit\">Edit Profile Description</button>");
 			}
     		content.println("</div>");
@@ -189,7 +189,8 @@ public class AccountPageServlet extends HttpServlet {
                 // Handle regular form data (profile text update)
                 String params = getRequestData(req);
                 String value = params.substring("value=".length(), params.length());
-                boolean result = Database.addAccountInfo(username, value);
+                String sanitizedValue = encodeHTML(value);
+                boolean result = Database.addAccountInfo(username, sanitizedValue);
 
                 // Respond with success or failure
                 PrintWriter out = res.getWriter();
@@ -261,6 +262,15 @@ public class AccountPageServlet extends HttpServlet {
             e.printStackTrace();
             res.getWriter().print("Error uploading profile picture: " + e.getMessage());
         }
+       
     }
+        private String encodeHTML(String input){
+            if (input == null) return "";
+            return input.replace("&", "&amp;")
+                        .replace("<", "&lt;")
+                        .replace(">", "&gt;")
+                        .replace("\"", "&quot;")
+                        .replace("'", "&#x27;");
+        }
 
 }

@@ -105,7 +105,7 @@ function ajaxSyncRequest(reqURL, parameter) {
 		if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
 			console.log(xhs.responseText);
 			console.log(parameter);
-			document.querySelector("#profile").innerHTML = parameter;
+			document.querySelector("#profile").textContent = parameter;
 			alert("Profile Description updated.");
 		}
 		else {
