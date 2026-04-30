@@ -216,7 +216,7 @@ public class AccountPageServlet extends HttpServlet {
         return sb.toString();
     }
 
-    // Helper method for handling file upload
+// Helper method for handling file upload
     private void handleFileUpload(HttpServletRequest req, HttpServletResponse res, String username) throws IOException {
         // Use Apache Commons FileUpload to handle file uploads
         DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -227,6 +227,13 @@ public class AccountPageServlet extends HttpServlet {
             List<FileItem> items = upload.parseRequest(req);
             for (FileItem item : items) {
                 if (!item.isFormField() && item.getFieldName().equals("profilePic")) {
+                    // Check MIME type
+                    String contentType = item.getContentType();
+                    if (contentType == null || !contentType.startsWith("image/")) {
+                        res.getWriter().print("Only image files are allowed.");
+                        return;
+                    }
+
                     // Get the uploaded file name
                     String fileName = item.getName();
                 
@@ -258,19 +265,19 @@ public class AccountPageServlet extends HttpServlet {
                     res.getWriter().print("Profile picture uploaded successfully. refresh the page");
                 }
             }
-        } catch (Exception e) {
+         } catch (Exception e) {
             e.printStackTrace();
             res.getWriter().print("Error uploading profile picture: " + e.getMessage());
         }
-       
     }
-        private String encodeHTML(String input){
-            if (input == null) return "";
-            return input.replace("&", "&amp;")
-                        .replace("<", "&lt;")
-                        .replace(">", "&gt;")
-                        .replace("\"", "&quot;")
-                        .replace("'", "&#x27;");
-        }
+
+    private String encodeHTML(String input){
+        if (input == null) return "";
+        return input.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&#x27;");
+    }
 
 }

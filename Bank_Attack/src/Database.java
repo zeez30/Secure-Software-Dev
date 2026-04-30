@@ -297,10 +297,20 @@ public class Database {
      * Update profile picture
      */
     public static boolean updateProfilePicture(String username, String imageFilePath) {
-        if (imageFilePath.endsWith(".exe")) {
-            System.out.println("File type .exe is not allowed.");
-            return false;
+    String[] allowedExtentions = {"jpg", "jpeg", "png", "gif"};
+    String fileExtention = imageFilePath.substring(imageFilePath.lastIndexOf(".") + 1).toLowerCase();
+    boolean isAllowed = false;
+    for (String ext : allowedExtentions){
+        if (ext.equals(fileExtention)){
+            isAllowed = true;
+            break;
         }
+    }
+    if (!isAllowed){
+        System.out.println("File type ." + fileExtention + "is not allowed");
+        return false;
+    }
+
 
         String query = "UPDATE LoginInformation SET profilePicture = ? WHERE username = ?";
         try (Connection conn = getConnection();

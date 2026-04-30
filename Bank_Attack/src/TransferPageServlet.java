@@ -159,9 +159,9 @@ public class TransferPageServlet extends HttpServlet {
                 res.setStatus(HttpServletResponse.SC_OK);
 
                 // Get two parameters: the user to whom credits are trasferred and the number of credits to transfer
-                String csrftToken = (String) session.getAttribute("csrfToken");
-                String submittedToken = red.getParameter("csrfToken");
-                if (csrf == null || !csrfToken.Equals(submittedToken)) {
+                String csrfToken = (String) session.getAttribute("csrfToken");
+                String submittedToken = req.getParameter("csrfToken");
+                if (csrfToken == null || !csrfToken.equals(submittedToken)) {
                         res.sendRedirect("/transfer");
                         return;
                 }
@@ -204,7 +204,7 @@ public class TransferPageServlet extends HttpServlet {
 	}
         private String generateCRSFToken(){
                 SecureRandom random = new SecureRandom();
-                byte[] byte = new byte[32];
+                byte[] bytes = new byte[32];
                 random.nextBytes(bytes);
                 return Base64.getUrlEncoder().encodeToString(bytes);
         }

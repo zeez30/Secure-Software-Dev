@@ -62,7 +62,8 @@ public class TargetServer {
 		scavenger.setIntervalSec(SCAVENGE_INTERVAL);
 		idManager.setSessionHouseKeeper(scavenger);
 		sessions.setSessionIdManager(idManager);
-	
+		sessions.getSessionCookieConfig().setHttpOnly(true);
+
 		// finish initialization of handler
 		context.setContextPath("/");
 		server.setHandler(context);

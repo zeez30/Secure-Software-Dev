@@ -101,16 +101,29 @@ public class ViewPageServlet extends HttpServlet {
  
             if (username != null && !username.equals(new String(""))){
                 if(Database.authenticateUser(username, password)){
-                    req.getSession(true).setAttribute("username", username);
-                    req.getSession().setAttribute("clicks", 0);
-                        
-                    // redirect to main page
-                    res.sendRedirect("/account");}
-                else {
-                    res.sendRedirect("/welcome?loginMessage=Wrong Username of Password");
-                }
-            } else { 
+					//Invalidate old session to prevent session fixation
+					HttpSession oldSession = req.getSession(false);
+					if (oldSession != null){
+						oldSession.invalidate();
+					}
+					//Create new session
+					HttpSession  newSession = req.getSession(true);
+					newSession.setAttribute("username", username);
+					newSession.setAttribute("clicks", 0);
+
+					//Session timeout set to 15 mins
+					newSession.setMaxInactiveInterval(15 * 60);
+
+
+					//redirect to main page 
+					res.sendRedirect("/account");
+				} else {
+					res.sendRedirect("/welcome?loginMessages=Wrong Username or Password");
+				}
+			} else {
 				res.sendRedirect("/welcome");
-            }	
+			}
+
+
 	}
 }
